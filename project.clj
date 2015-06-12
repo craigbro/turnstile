@@ -1,4 +1,4 @@
-(defproject turnstile "0.99"
+(defproject turnstile "0.100"
   :description "A distributed rate-limiting service on top of Redis."
   :url "http://github.com/craigbro/turnstile"
   :license {:name "Eclipse Public License"

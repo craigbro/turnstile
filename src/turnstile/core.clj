@@ -4,11 +4,11 @@
 
 (defprotocol Turnstile
   (expire-entries [this now-ms])
+  (space [this limit])
   (has-space? [this limit])
   (next-slot [this limit now-ms])
   (add-timed-item [this item time-ms])
   (reset [this]))
-
 
 (defrecord RedisTurnstile [conn-spec pool name expiration-ms]
   Turnstile
@@ -17,6 +17,8 @@
       ;; remove all entries whose score is more them expiration-ms + 1 old (relative to now-ms)
       (car/zremrangebyscore name 0 (- now-ms expiration-ms 1)))
     this)
+  (space [this limit]
+    (- limit (car/with-conn pool conn-spec (car/zcard name))))
   (has-space? [this limit]
     (<  (car/with-conn pool conn-spec
           (car/zcard name)) limit))
