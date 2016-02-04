@@ -8,6 +8,7 @@
   (has-space? [this limit])
   (next-slot [this limit now-ms])
   (add-timed-item [this item time-ms])
+  (delete-item [this item])
   (reset [this]))
 
 (defrecord RedisTurnstile [conn-spec pool name expiration-ms]
@@ -34,6 +35,10 @@
       (car/zadd name time-ms item)
       (car/pexpire name (+ expiration-ms 1000))
       this))
+  (delete-item [this item]
+    (car/with-conn pool conn-spec
+      (car/zrem name item))
+    this)
   (reset [this]
     (car/with-conn pool conn-spec
       (car/del name))
